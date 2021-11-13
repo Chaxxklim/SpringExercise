@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.car.mapper.CarMapper">
+	<!-- 상품 목록 -->
+		<resultMap id="resultMap1" type="hashMap">
+		<result column="P_ID" property="P_ID"/>          
+		<result column="P_NAME" property="P_NAME"/>        
+		<result column="P_UNITPRICE" property="P_UNITPRICE"/>   
+		<result column="P_DESCRIPTION" property="P_DESCRIPTION" jdbcType="CLOB" javaType="java.lang.String"/> 
+		<result column="P_CATEGORY" property="P_CATEGORY"/>    
+		<result column="P_MANUFACTURER" property="P_MANUFACTURER"/>
+		<result column="P_UNITSINSTOCK" property="P_UNITSINSTOCK"/>
+		<result column="P_CONDITION" property="P_CONDITION"/>   
+		<result column="P_FILENAME" property="P_FILENAME"/>    
+	</resultMap>
+	
+	<select id="list" resultMap="resultMap1">
+		<![CDATA[
+		SELECT * FROM PRODUCT
+		]]>
+		ORDER BY P_ID DESC
+	</select>
+	
+	<!-- 다음 상품 코드 생성 -->
+	<select id="getPid" resultType="String">
+		SELECT SUBSTR(MAX(P_ID),1,1) || TRIM(SUBSTR(MAX(P_ID),2)+1) PID
+		FROM   PRODUCT
+	</select>
+	
+	<!-- 상품 등록 -->
+	<insert id="insert" parameterType="hashMap" >
+		insert into product values(#{productId},#{pName},#{unitPrice},#{description},#{category},#{manufacturer},
+		#{unitsInStock},#{condition},#{fileName})
+	</insert>
+	<!-- 상품 상세 -->
+	<select id="detail" parameterType="hashMap" resultMap="resultMap1">
+		select * from product where p_id=#{pId}
+	</select>
+	<!-- 상품정보 수정  -->
+	<select id="update" resultMap="resultMap1">
+		<![CDATA[
+		SELECT * FROM PRODUCT
+		]]>
+		ORDER BY P_ID DESC
+	</select>
+	
+	<update id="processUpdate" parameterType="hashMap">
+		UPDATE PRODUCT 
+				 SET P_NAME=#{pName},P_UNITPRICE=#{unitPrice},P_DESCRIPTION=#{description},P_CATEGORY=#{category},
+					 P_MANUFACTURER=#{manufacturer},P_UNITSINSTOCK=#{unitsInStock},P_CONDITION=#{condition}
+			  		 <if test="fileName != null and fileName != ''">
+			  	     ,P_FILENAME=#{fileName}
+					 </if>
+			  WHERE  P_ID= #{productId}
+	</update>
+	
+	<delete id="delete" parameterType="String">
+		DELETE FROM PRODUCT WHERE P_ID = #{id}
+	</delete>
+	
+
+</mapper>
+
+
+
+
