@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.jasper.tagplugins.jstl.core.If;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +23,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import kr.or.ddit.cus.vo.EmpVO;
 import kr.or.ddit.emp.service.EmpService;
+import kr.or.ddit.emp.vo.EmpVO;
 import kr.or.ddit.emp.vo.Member;
 
 @Controller
@@ -33,6 +34,15 @@ public class EmpController {
 	
 	@Autowired
 	EmpService empService;
+	
+	@RequestMapping("/logout")
+	public String lougout(HttpServletRequest request){
+		
+		HttpSession session = request.getSession();
+		session.invalidate();
+		
+		return "redirect:/emp/loginForm";
+	}
 	
 	@RequestMapping("/emp/list")
 	public String list(Model model) throws Exception {
@@ -296,7 +306,60 @@ public class EmpController {
 		return "emp/result";
 	}
 	
+	//직원 로그인 처리
+	@RequestMapping("/emp/loginForm")
+	public String loginForm(Model model) {
+		
+		model.addAttribute("emp", new EmpVO());
+		return "emp/loginForm";
+	}
 	
+	//로그인 처리
+	@RequestMapping("/emp/login")
+	public String login(@ModelAttribute("emp") @Validated EmpVO empVO, 
+			BindingResult result, HttpServletRequest request, Model model) throws Exception {
+		logger.info("emp :" + empVO.toString());
+		
+		logger.info("result.hasErrors() : " + result.hasErrors());
+		if (result.hasErrors()) { //validated 결과 문제발생
+			logger.info("resulttoString : " + result.toString());
+			return "emp/loginForm";
+		}else { // 없으면
+			HttpSession session = request.getSession();
+			//아이디에 해당되는 직원 있는가?
+			String empNo = empVO.getEmpNo();
+			String password = empVO.getPassword();
+			
+			EmpVO dpEmpVo = this.empService.detail(empNo);
+			if(dpEmpVo != null) { // 아이디에 해당되는 직원이 있고, 입력한 비밀번호와 해당 아이디의 db쪽 비밀번호가 일치하면
+				if (password.equals(dpEmpVo.getPassword())) {
+					session.setAttribute("EMPVO", empVO);
+					logger.info("Login Success");
+					session.setAttribute("EMPVO", empVO);
+					
+					return "emp/index";
+				}else { // 로그인 실패
+					logger.info("Login fail");
+					empVO = new EmpVO();
+					model.addAttribute("loginFail", "비밀번호가 틀렸습니다.");
+					return "emp/loginForm";
+				}
+			}else { // 아이디에 해당되는 직원이 없음
+				empVO = new EmpVO();
+				model.addAttribute("loginFail","해당 아이디가 없습니다.");
+				return "emp/loginForm";
+			}
+			
+			//LoginCheckFilter.java에서 session.getAttribute("EMPVO")
+		}
+		
+	}
+	//메인 화면
+	@RequestMapping("/emp/index")
+	public String index() {
+		
+		return "emp/index";
+	}
 }
 
 

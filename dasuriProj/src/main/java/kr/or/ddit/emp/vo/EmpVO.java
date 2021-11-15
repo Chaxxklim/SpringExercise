@@ -1,4 +1,4 @@
-package kr.or.ddit.cus.vo;
+package kr.or.ddit.emp.vo;
 
 import java.io.Serializable;
 
@@ -28,7 +28,7 @@ public class EmpVO implements Serializable{
 	private String hp;
 	@NotBlank
 	private String postNo;
-	@NotBlank
+//	@NotBlank
 	private String addr2;
 	@NotBlank
 	private String password;

@@ -5,8 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor // 기본 생성자 있어야함
+@AllArgsConstructor // 기본 생성자 있어야함
 public class ArticleContentVO {
 
 	private int articleNo;

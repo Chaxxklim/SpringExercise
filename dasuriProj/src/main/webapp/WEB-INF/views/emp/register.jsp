@@ -105,7 +105,7 @@
 										</font>
 									</div>
 									<div class="col-sm-6">
-										<input id="password" type="password"
+										<input id="password2" type="password"
 											class="form-control form-control-user" placeholder="비밀번호 확인">
 										<font color="red" size="1" id="idFont" style="display: none;">
 											비밀번호가 다릅니다. </font>
