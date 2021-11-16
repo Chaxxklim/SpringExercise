@@ -15,8 +15,8 @@ public class ArticleVO {
 	private WriterVO writerVO;
 	@NotBlank
 	private String title;
-	private Date regDate;
-	private Date modDate;
+	private String regDate;
+	private String modDate;
 	private ArticleContentVO articleContentVO;
 	private int readCnt;
 }

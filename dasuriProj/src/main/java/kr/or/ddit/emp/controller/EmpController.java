@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.jasper.tagplugins.jstl.core.If;
@@ -317,9 +319,11 @@ public class EmpController {
 	//로그인 처리
 	@RequestMapping("/emp/login")
 	public String login(@ModelAttribute("emp") @Validated EmpVO empVO, 
-			BindingResult result, HttpServletRequest request, Model model) throws Exception {
+			@RequestParam(value="customCheck", required = false) String customCheck, 
+			BindingResult result, HttpServletRequest request, HttpServletResponse response,
+								Model model) throws Exception {
 		logger.info("emp :" + empVO.toString());
-		
+		logger.info("customCheck : " + customCheck);
 		logger.info("result.hasErrors() : " + result.hasErrors());
 		if (result.hasErrors()) { //validated 결과 문제발생
 			logger.info("resulttoString : " + result.toString());
@@ -330,13 +334,35 @@ public class EmpController {
 			String empNo = empVO.getEmpNo();
 			String password = empVO.getPassword();
 			
-			EmpVO dpEmpVo = this.empService.detail(empNo);
-			if(dpEmpVo != null) { // 아이디에 해당되는 직원이 있고, 입력한 비밀번호와 해당 아이디의 db쪽 비밀번호가 일치하면
-				if (password.equals(dpEmpVo.getPassword())) {
-					session.setAttribute("EMPVO", empVO);
+			EmpVO dbEmpVo = this.empService.detail(empNo);
+			if(dbEmpVo != null) { // 아이디에 해당되는 직원이 있고, 입력한 비밀번호와 해당 아이디의 db쪽 비밀번호가 일치하면
+				if (password.equals(dbEmpVo.getPassword())) {
+					session.setAttribute("EMPVO", dbEmpVo);
 					logger.info("Login Success");
-					session.setAttribute("EMPVO", empVO);
-					
+
+					if(customCheck!=null) {
+						//아이디기억하기를 체크했을 경우..
+						if(customCheck.equals("on")) {
+							logger.info("customCheck on 실행");
+							//쿠키 생성(직원 번호)
+							Cookie cookie = new Cookie("empNo", empVO.getEmpNo());
+							//초단위 설정(60초 -> 1분 -> 하루 -> 한달)
+							cookie.setMaxAge(60 * 60 * 24 * 30);
+							response.addCookie(cookie);
+						}else {//아이디기억하기를 체크하지 않았을 경우
+							//쿠키 삭제
+							Cookie cookie = new Cookie("empNo", "");
+							//초단위 설정(0)
+							cookie.setMaxAge(0);
+							response.addCookie(cookie);
+						}
+					}else {
+						//쿠키 삭제
+						Cookie cookie = new Cookie("empNo", "");
+						//초단위 설정(0)
+						cookie.setMaxAge(0);
+						response.addCookie(cookie);
+					}
 					return "emp/index";
 				}else { // 로그인 실패
 					logger.info("Login fail");
@@ -359,6 +385,13 @@ public class EmpController {
 	public String index() {
 		
 		return "emp/index";
+	}
+	
+	//도메인 시작 메인화면
+	@RequestMapping("/")
+	public String initMain() {
+		
+		return "redirect:/emp/index";
 	}
 }
 

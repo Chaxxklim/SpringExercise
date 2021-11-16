@@ -1,7 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+
+
+
+
 <!DOCTYPE html>
+
+
 <html lang="en">
 
 <head>
@@ -9,7 +15,12 @@
 <script type="text/javascript">
 $(function(){
 	$("#idLogin").on("click", function(){
-		$("#frm").submit();
+// 		var customCheck = $('[name = customCheck]').is(':checked');
+// 		alert(customCheck)
+		
+				$("#frm").submit();
+		
+		
 	})
 })
 
@@ -62,7 +73,7 @@ $(function(){
                                         	<c:if test="${loginFail != '' }">
                                         	<font color="red" size="1">${loginFail }</font></c:if>
                                             <form:input path="empNo" class="form-control form-control-user"
-                                                placeholder="직원 ID"/>
+                                                placeholder="직원 ID" value="${empNo }"/>
                                             <font color="red"><form:errors path="empNo"></form:errors></font>
                                         </div>
                                         <div class="form-group">
@@ -72,7 +83,7 @@ $(function(){
                                         </div>
                                         <div class="form-group">
                                             <div class="custom-control custom-checkbox small">
-                                                <input type="checkbox" class="custom-control-input" id="customCheck">
+                                                <input type="checkbox" class="custom-control-input" name = "customCheck" id="customCheck">
                                                 <label class="custom-control-label" for="customCheck">ID 기억하기</label>
                                             </div>
                                         </div>
@@ -105,6 +116,23 @@ $(function(){
         </div>
 
     </div>
+<%
+	//요청할 때마다 request객체에 cookie가 함께 던져짐
+	Cookie[] cookies = request.getCookies();
+	String empNo = "";
+	if(cookies != null){
+		for(int i = 0; i < cookies.length; i++){
+			if(cookies[i].getName().equals("empNo")){
+				out.print(cookies[i].getName());
+				System.out.println(cookies[i].getName());
+				
+				empNo = cookies[i].getValue();
+			}
+		}
+	}
+	
+%>
+<c:set var="empNo" value="<%=empNo %>"/>
 
     <!-- Bootstrap core JavaScript-->
     <script src="/resources/vendor/jquery/jquery.min.js"></script>

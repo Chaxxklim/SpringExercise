@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.article.mapper.ArticleMapper">
+	<!-- artice 테이블로 insert -->
+	<insert id="insertArticle"  parameterType = "articleVo">
+		<selectKey keyProperty="articleNo" order="BEFORE" resultType="int">
+			(SELECT NVL(MAX(ARTICLE_NO), 0) + 1 FROM ARTICLE)
+		</selectKey>
+			
+			
+			INSERT INTO ARTICLE (
+		    ARTICLE_NO,
+		    WRITER_ID,
+		    WRITER_NAME,
+		    TITLE,
+		    REGDATE,
+		    MODDATE,
+		    READ_CNT
+		) VALUES (
+		    #{articleNo},
+		    #{writerVO.writerId},
+		    #{writerVO.writerName},
+		    #{title},
+		    SYSDATE,
+		    NULL,
+		    0
+		)
+	</insert>
+
+	
+	<!-- artice_content 테이블로 insert -->
+	<insert id="insertArticleContent">
+	INSERT INTO ARTICLE_CONTENT(ARTICLE_NO, CONTENT)
+	VALUES(#{articleNo}, #{articleContentVO.content})
+	</insert>
+	
+	<!-- 게시글 목록 select -->
+	<select id="selectAllArticle" resultType="hashMap">
+		
+	SELECT A.ARTICLE_NO, A.WRITER_ID, A.WRITER_NAME, A.TITLE, TO_CHAR(A.REGDATE,'YYYY-MM-DD') AS REGDATE
+	 , TO_CHAR(A.MODDATE,'YYYY-MM-DD') AS MODDATE, B.CONTENT, A.READ_CNT
+	  FROM ARTICLE A, ARTICLE_CONTENT B
+	 WHERE A.ARTICLE_NO = B.ARTICLE_NO
+	 ORDER BY ARTICLE_NO DESC
+	</select>		
+	
+	<!-- 전체 게시글 (행의 수) -->
+	<select id="totalArticle" resultType="int">
+		SELECT COUNT(*) CNT FROM VW_ARTICLE_CONTENT
+	</select>
+</mapper>
