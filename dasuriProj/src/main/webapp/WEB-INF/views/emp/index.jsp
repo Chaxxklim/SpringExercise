@@ -37,7 +37,7 @@
             <div id="content">
 
                 <!-- Topbar 시작 -->
-<jsp:include page="../topbar.jsp" />
+		<jsp:include page="../topbar.jsp" />
                 <!-- End of Topbar 끝 -->
 
                 <!-- Begin Page Content -->

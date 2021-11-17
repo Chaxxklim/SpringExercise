@@ -7,8 +7,6 @@
 		<selectKey keyProperty="articleNo" order="BEFORE" resultType="int">
 			(SELECT NVL(MAX(ARTICLE_NO), 0) + 1 FROM ARTICLE)
 		</selectKey>
-			
-			
 			INSERT INTO ARTICLE (
 		    ARTICLE_NO,
 		    WRITER_ID,
@@ -35,14 +33,43 @@
 	VALUES(#{articleNo}, #{articleContentVO.content})
 	</insert>
 	
+	<!-- 
+	id와 result
+	공통점 : 검색 결과의 한개의 컬럼을 프로퍼티에 매핑
+	차이  : id) 객체 인스턴스 비교시 사용되는 구분자 프로퍼티(기본키)
+			result) 유일한 것(기본키) 이외
+		 -->
+	<resultMap type="articleVo" id="articleMap">
+		<id property="articleNo" column="ARTICLE_NO"></id>
+		<id property="rnum" column="RNUM"></id>
+		<id property="title" column="TITLE"></id>
+		<id property="regDate" column="REGDATE"></id>
+		<id property="modDate" column="MODDATE"></id>
+		<id property="readCnt" column="READ_CNT"></id>
+			<association property="writerVO" javaType="writerVo">
+				<result property="writerId" column="WRITER_ID"/>
+				<result property="writerName" column="WRITER_NAME"/>
+			</association>
+			<association property="articleContentVO" javaType="articleContentVo">
+				<result property="articleNo" column="ARTICLE_NO"/>
+				<result property="content" column="CONTENT" jdbcType="CLOB" javaType="java.lang.String"/>
+			</association>	
+	</resultMap>
+	
+	
 	<!-- 게시글 목록 select -->
-	<select id="selectAllArticle" resultType="hashMap">
+	<select id="selectAllArticle" resultMap="articleMap" parameterType="hashMap">
 		
-	SELECT A.ARTICLE_NO, A.WRITER_ID, A.WRITER_NAME, A.TITLE, TO_CHAR(A.REGDATE,'YYYY-MM-DD') AS REGDATE
-	 , TO_CHAR(A.MODDATE,'YYYY-MM-DD') AS MODDATE, B.CONTENT, A.READ_CNT
-	  FROM ARTICLE A, ARTICLE_CONTENT B
-	 WHERE A.ARTICLE_NO = B.ARTICLE_NO
-	 ORDER BY ARTICLE_NO DESC
+SELECT T.*
+FROM
+(
+SELECT ROW_NUMBER() OVER (ORDER BY A.ARTICLE_NO DESC) AS RNUM
+        ,A.ARTICLE_NO, A.WRITER_ID, A.WRITER_NAME, A.TITLE
+        ,TO_CHAR(A.REGDATE,'YYYY-MM-DD') AS REGDATE, TO_CHAR(A.MODDATE,'YYYY-MM-DD') AS MODDATE, B.CONTENT, A.READ_CNT
+  FROM ARTICLE A, ARTICLE_CONTENT B
+ WHERE A.ARTICLE_NO = B.ARTICLE_NO
+ ) T
+ WHERE T.RNUM BETWEEN #{currentPage} * 10 - 9  AND #{currentPage} * 10
 	</select>		
 	
 	<!-- 전체 게시글 (행의 수) -->

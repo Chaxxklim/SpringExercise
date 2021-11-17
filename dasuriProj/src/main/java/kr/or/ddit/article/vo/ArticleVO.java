@@ -1,6 +1,5 @@
 package kr.or.ddit.article.vo;
 
-import java.util.Date;
 
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -11,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ArticleVO {
+	private int rnum;
 	private int articleNo;
 	private WriterVO writerVO;
 	@NotBlank

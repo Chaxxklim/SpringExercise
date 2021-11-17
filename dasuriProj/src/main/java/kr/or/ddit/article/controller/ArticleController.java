@@ -3,6 +3,7 @@ package kr.or.ddit.article.controller;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -69,37 +70,48 @@ public class ArticleController {
 	
 	@RequestMapping("/listArticle")
 	public String listArtice(Model model, @RequestParam(value="currentPage",
-			defaultValue="1") String currentPage) throws Exception
-	{
+			defaultValue="1") String currentPage) throws Exception {
+		
+		Map<String, Object> map = new HashMap<String, Object>();
+		
 		int total = this.articleService.totalArticle();
-		List<Map<String,Object>> mapList = this.articleService.selectAllArticle();
+		int modVal = Integer.parseInt(currentPage) % 5;
+		int startPage = Integer.parseInt(currentPage) / 5 * 5 + 1;
+		if(modVal == 0) startPage -= 5;
+		int endPage = startPage + 4;
+		int totalPages = total / 10;
+		if(endPage > totalPages) endPage = totalPages;
+		
+		map.put("currentPage", currentPage);
+		
+		List<ArticleVO> mapList = this.articleService.selectAllArticle(map);
 		if(mapList != null) logger.info("mapList : " + mapList.get(0).toString());
 		
-		List<ArticleVO> articleVOList = 
-				new ArrayList<ArticleVO>();
 		
-		for(Map<String, Object> map : mapList) {
-			WriterVO writerVo = new WriterVO(
-			(String)map.get("WRITER_ID"),
-			(String)map.get("WRITER_NAME"));
-
-			ArticleContentVO articleContentVO = new ArticleContentVO(
-			Integer.valueOf((String)map.get("ARTICLE_NO")),
-			(String)map.get("CONTENT"));
-			
-			ArticleVO articleVo = new ArticleVO(
-			Integer.valueOf((String)map.get("ARTICLE_NO")),
-			writerVo,
-			(String)map.get("TITLE"),
-			(String)map.get("REGDATE"),
-			(String)map.get("MODDATE"),
-			articleContentVO,
-			Integer.valueOf((String)map.get("READ_CNT"))
-			);
-			articleVOList.add(articleVo);
-		}
+	
+		
+//		for(Map<String, Object> map : mapList) {
+//			WriterVO writerVo = new WriterVO(
+//			(String)map.get("WRITER_ID"),
+//			(String)map.get("WRITER_NAME"));
+//
+//			ArticleContentVO articleContentVO = new ArticleContentVO(
+//			Integer.valueOf((String)map.get("ARTICLE_NO")),
+//			(String)map.get("CONTENT"));
+//			
+//			ArticleVO articleVo = new ArticleVO(
+//			Integer.valueOf((String)map.get("ARTICLE_NO")),
+//			writerVo,
+//			(String)map.get("TITLE"),
+//			(String)map.get("REGDATE"),
+//			(String)map.get("MODDATE"),
+//			articleContentVO,
+//			Integer.valueOf((String)map.get("READ_CNT"))
+//			);
+//			articleVOList.add(articleVo);
+//		}
 		model.addAttribute("articlePage", 
-				new ArticlePage(total, Integer.parseInt(currentPage), 10, articleVOList));
+				new ArticlePage(total, Integer.parseInt(currentPage), 10, mapList));
 		return "article/listArticle";
 	}
 	

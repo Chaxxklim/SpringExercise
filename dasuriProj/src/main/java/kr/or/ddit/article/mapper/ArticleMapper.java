@@ -11,7 +11,9 @@ public interface ArticleMapper {
 	
 	int insertArticleContent(ArticleVO articleVO);
 	
-	List<Map<String, Object>> selectAllArticle();
+	List<ArticleVO> selectAllArticle(Map<String, Object> map);
 	
 	int totalArticle();
+	
+	
 }

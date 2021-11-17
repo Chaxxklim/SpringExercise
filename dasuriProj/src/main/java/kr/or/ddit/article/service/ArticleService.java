@@ -8,7 +8,7 @@ import kr.or.ddit.article.vo.ArticleVO;
 public interface ArticleService {
 	int insertArticle(ArticleVO articleVO) throws Exception;
 
-	List<Map<String, Object>> selectAllArticle() throws Exception;
+	List<ArticleVO> selectAllArticle(Map<String, Object> map) throws Exception;
 
 	int totalArticle() throws Exception;
 

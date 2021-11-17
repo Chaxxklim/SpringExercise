@@ -23,8 +23,8 @@ public class ArticleServiceImpl implements ArticleService{
 	}
 
 	@Override
-	public List<Map<String, Object>> selectAllArticle(){
-		return this.articleMapper.selectAllArticle();
+	public List<ArticleVO> selectAllArticle(Map<String, Object> map){
+		return this.articleMapper.selectAllArticle(map);
 	}
 
 	@Override
