@@ -31,6 +31,8 @@ public class ArticleServiceImpl implements ArticleService{
 	public int totalArticle() {
 		return this.articleMapper.totalArticle();
 	}
+	
+	
 
 
 }
