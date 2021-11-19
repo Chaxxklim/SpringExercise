@@ -56,24 +56,51 @@
 			</association>	
 	</resultMap>
 	
+	<!-- ArticleFile Result -->
+	<resultMap type="articleFileVO" id="articleFileMap">
+		<id property="articleNo" column="ARTICLE_NO"></id>
+		<id property="fileName" column="FILE_NAME"></id>
+		<id property="fileNo" column="FILE_NO"></id>
+		<id property="filePath" column="FILE_PATH"></id>
+		<id property="fileOriginalName" column="FILE_ORIGINALNAME"></id>
+	</resultMap>
+	
+	
+	
 	
 	<!-- 게시글 목록 select -->
 	<select id="selectAllArticle" resultMap="articleMap" parameterType="hashMap">
 		
-SELECT T.*
-FROM
-(
-SELECT ROW_NUMBER() OVER (ORDER BY A.ARTICLE_NO DESC) AS RNUM
-        ,A.ARTICLE_NO, A.WRITER_ID, A.WRITER_NAME, A.TITLE
-        ,TO_CHAR(A.REGDATE,'YYYY-MM-DD') AS REGDATE, TO_CHAR(A.MODDATE,'YYYY-MM-DD') AS MODDATE, B.CONTENT, A.READ_CNT
-  FROM ARTICLE A, ARTICLE_CONTENT B
- WHERE A.ARTICLE_NO = B.ARTICLE_NO
- ) T
- WHERE T.RNUM BETWEEN #{currentPage} * 10 - 9  AND #{currentPage} * 10
+		SELECT T.*
+		FROM
+		(
+		SELECT ROW_NUMBER() OVER (ORDER BY A.ARTICLE_NO DESC) AS RNUM
+		        ,A.ARTICLE_NO, A.WRITER_ID, A.WRITER_NAME, A.TITLE
+		        ,TO_CHAR(A.REGDATE,'YYYY-MM-DD') AS REGDATE, TO_CHAR(A.MODDATE,'YYYY-MM-DD') AS MODDATE, B.CONTENT, A.READ_CNT
+		  FROM ARTICLE A, ARTICLE_CONTENT B
+		 WHERE A.ARTICLE_NO = B.ARTICLE_NO
+		 ) T
+		 WHERE T.RNUM BETWEEN #{currentPage} * 10 - 9  AND #{currentPage} * 10
 	</select>		
 	
 	<!-- 전체 게시글 (행의 수) -->
 	<select id="totalArticle" resultType="int">
 		SELECT COUNT(*) CNT FROM VW_ARTICLE_CONTENT
 	</select>
+	
+	<insert id="insertFile" parameterType="articleFileVO">
+		<selectKey keyProperty="articleNo" order="BEFORE" resultType="int">
+			(SELECT NVL(MAX(ARTICLE_NO), 0) + 1 FROM ARTICLE)
+		</selectKey>
+		INSERT INTO ARTICLEFILE VALUES(#{articleNo},#{fileName},(SELECT NVL(MAX(ARTICLE_NO), 0) + 1 FROM ARTICLEFILE))
+	</insert>
+
+	<select id="selectFile" parameterType="articleVo" resultMap="articleFileMap">
+		SELECT * FROM ARTICLEFILE WHERE ARTICLE_NO = #{articleNo}
+	</select>
+	
+	<select id="selectFileCount" parameterType="articleVo" resultType="int">
+		SELECT COUNT(*) FROM ARTICLEFILE WHERE ARTICLE_NO = #{articleNo}
+	</select>
+	
 </mapper>

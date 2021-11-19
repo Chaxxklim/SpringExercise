@@ -12,7 +12,7 @@
 <body>
 
 <form:form method="post" action="/article/newArticlePost"
-   modelAttribute="article">
+   modelAttribute="article" enctype="multipart/form-data">
    <p>
       제목: <br />
       <form:input path="title" />
@@ -28,6 +28,7 @@
       </font>
    </p>
    <form:button name="register">등록</form:button>
+   <input type="file" name="uploadFile"  multiple/>
 </form:form>
 
 <script type="text/javascript">

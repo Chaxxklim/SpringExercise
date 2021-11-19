@@ -1,6 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+
 <!DOCTYPE html>
 <html>
 
@@ -79,6 +83,7 @@
 											<th>제목</th>
 											<th>작성자</th>
 											<th>조회수</th>
+											<th>첨부파일</th>
 										</tr>
 									</thead>
 									<tbody>
@@ -88,6 +93,17 @@
 												<td>${article.title}</td>
 												<td>${article.writerVO.writerName}</td>
 												<td>${article.readCnt}</td>
+<%-- 											<c:set var="fileChkNo" value=" ${fileChkList}"/> --%>
+<%-- 											<fmt:parseNumber var="newFileChkNo" type="number" value="${fileChkNo}"/> --%>
+<%-- 											<c:forEach var="newFileChkNo" items="${fileChkList }"> --%>
+<%-- 												<c:forEach var="i" begin="1" end="${fn:length(fileChkList) }"> --%>
+<%-- 												<c:if test="${article.articleNo eq fileChkList.newFileChkNo }"> --%>
+													
+													<td><div id="fileDiv"${article.articleNo}><button class="btn btn-secondary" type="button" id="fileBtn${article.articleNo})"
+													 onclick="fileFunction(${article.articleNo})">첨부파일</button></div></td>
+<%--  												</c:if>	 --%>
+<%--  												</c:forEach> --%>
+<%-- 											</c:forEach> --%>
 											</tr>
 										</c:forEach>
 									</tbody>
@@ -112,7 +128,7 @@
 									</div>
 								</div>
 							</div>
-						</div>
+						</div>	
 					</div>
 				</div>
 				<!-- /.container-fluid -->
@@ -168,13 +184,57 @@
 	<script src="/resources/js/demo/datatables-demo.js"></script>
 
 <div id="div1">${articlePage.content }</div>
+<div id="chkList">
+	<c:forEach var="chk" items="${fileChkList}">
+		${chk }
+	</c:forEach>
+</div>
 <script type="text/javascript">
+// var articleNo = "${article.articleNo}"
+
+
+// 	var test = "{"+"${fileChkList}"+"}"
+// 	test.replace('[', '{')
+// 	test.replace(']' , '}')
+// 	console.log(test)
+// 	var arr = test.split(",");
+// 	const jsonObj = JSON.stringify(test);
+// 	console.log(jsonObj)
+	
+var gFileNo;
+
 
 	$(function(){
-		$("#div1").css("visiblity" , "hidden")
-		var articleVO = $("#div1").text();
-		const json = JSON.stringify(articleVO);
-		console.log('json :' + json);
+		var startNum = "${param.currentPage*10-9}"
+		var endNum = "${param.currentPage*10}"
+	
+		if(startNum == -9) startNum = 1
+		if(endNum ==0)endNum = 10
+		console.log("startNum" + startNum + "endNum" + endNum)
+		for(var i =startNum; i <= endNum; i++ ){
+			var value = {
+					"articleNo" : i
+			}
+			$.ajax({
+				type : 'POST',
+				url : '/article/chkFiles',
+				dataType : "text",
+				data : value,
+				success : function(res){
+					console.log(res)
+					
+				},
+				error : alert("통신 실패")
+			})
+			
+		}
+		
+		
+
+
+			
+	
+	
 	})
 	
 
@@ -189,6 +249,51 @@
 			doc.save('sample.pdf');
 		});
 	}
+	
+	function fileFunction(articleNo){
+		console.log(articleNo);
+// 		for(var i = 0; i < arr.length; i++){
+// 			if(arr[i] === fileNo){
+// 				$(("fileBtn") + fileNo).css("display" , "none")
+// 				$(("fileDiv") + fileNo).css("display" , "none")
+// 				$("#fileDiv").css("visiblity" , "hidden")
+// 				console.log("test" + $("fileBtn") + fileNo)
+// 				console.log(arr)
+// 			}
+// 		}
+// 		var value = {
+// 				"articleNo" : articleNo
+// 		}
+// 		$.ajax({
+// 			type : 'POST',
+// 			url : '/article/chkFiles',
+// 			dataType : "text",
+// 			data : value,
+// 			success : function(res){
+// 				console.log(res)
+				
+// 			},
+// 			error : alert("통신 실패")
+// 		})
+	
+	}
+	$(function(){
+		function fileFunction(fileNo){
+			console.log(fileNo);
+			for(var i = 0; i < arr.length; i++){
+				console.log("vari : "+ arr[i])
+				if(arr[i] === fileNo){
+					$(("#fileBtn") + fileNo).css("display" , "none")
+					$(("#fileDiv") + fileNo).css("display" , "none")
+					$("#fileDiv").css("visiblity" , "hidden")
+					console.log("test" + $("fileBtn") + fileNo)
+					console.log(arr)
+					console.log(fileNo)
+				}
+			}
+		}
+
+	})
 </script>
 </body>
 

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import kr.or.ddit.article.mapper.ArticleMapper;
 import kr.or.ddit.article.service.ArticleService;
+import kr.or.ddit.article.vo.ArticleFileVO;
 import kr.or.ddit.article.vo.ArticleVO;
 
 @Service
@@ -30,6 +31,16 @@ public class ArticleServiceImpl implements ArticleService{
 	@Override
 	public int totalArticle() {
 		return this.articleMapper.totalArticle();
+	}
+
+	@Override
+	public int selectFileCount(ArticleVO articleVO) {
+		return this.articleMapper.selectFileCount(articleVO);
+	}
+
+	@Override
+	public List<ArticleFileVO> selectFile(ArticleVO articleVO) {
+		return this.articleMapper.selectFile(articleVO);
 	}
 	
 	
